@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AAGIS Dashboard</title>
+  <link rel="icon" href="cyber.jpg">
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #004e92, #000428);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      margin: 20px 0;
+      font-size: 2rem;
+      text-align: center;
+    }
+    table {
+      width: 95%;
+      padding: 50PX;
+      padding-bottom: 50PX;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+    th, td {
+      padding: 60px;
+      text-align: center;
+    }
+    th {
+      background: rgba(0, 0, 0, 0.5);
+      text-transform: uppercase;
+    }
+    tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    tr:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transition: 0.3s;
+    }
+    .footer {
+      margin-top: auto;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+    @media(max-width:600px){
+      th, td { font-size: 0.8rem; padding: 30px; }
+      h1 { font-size: 1.5rem; }
+
+    }
+  </style>
+</head>
+<body>
+  <h1>🚨 SOS safety device (AAGIS)</h1>
+  
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Device</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th>Message</th>
+        <th>Date</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr><td colspan="6">Loading data...</td></tr>
+    </tbody>
+  </table>
+
+  <p class="footer">© 2025 SOS Tracker - Made by Cyber Crux</p>
+
+ <script>
+  // 🔹 Replace this with your Google Apps Script Web App URL
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwPH2KwPSkw_3qtD99tIILLBC6B7o4Xl2EZxDf7H2-pFw5LkRaYdRZaWfIykOizrv1M/exec";
+  async function loadData() {
+    const tableBody = document.getElementById("tableBody");
+    tableBody.innerHTML = "<tr><td colspan='6'>Loading...</td></tr>";
+
+    try {
+      const res = await fetch(scriptURL);
+      if (!res.ok) throw new Error("HTTP error " + res.status);
+
+      const data = await res.json();
+
+      if (!Array.isArray(data) || data.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='6'>No data found</td></tr>";
+        return;
+      }
+
+      tableBody.innerHTML = "";
+      data.reverse().forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.device || "-"}</td>
+          <td>${row.lat || "-"}</td>
+          <td>${row.lon || "-"}</td>
+          <td>${row.message || "-"}</td>
+          <td>${row.date || "-"}</td>
+          <td>${row.time || "-"}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      tableBody.innerHTML = "<tr><td colspan='6'>Error loading data</td></tr>";
+    }
+  }
+
+  // Initial load + auto refresh every 10 sec
+  loadData();
+  setInterval(loadData, 90000);
+</script>
+</body>
+</html>
